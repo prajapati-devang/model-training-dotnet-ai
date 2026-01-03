@@ -1,0 +1,28 @@
+﻿@using Microsoft.Extensions.ML
+@* Inject the Prediction Enfile for data results *@
+@inject PredictionEnginePool<SentimentData, SentimentPrediction> PredictionPool
+
+@page "/"
+
+<PageTitle>AI Sentiment Analyzer</PageTitle>
+
+<input @bind="userInput" placeholder="Type something..." />
+<button @onclick="Analyze">Analyze</button>
+
+@if (result != null)
+{
+    <p>Prediction: <strong>@(result.Prediction ? "Positive" : "Negative")</strong></p>
+    <p>Confidence: @(result.Probability.ToString("P2"))</p>
+}
+
+@code {
+    private string userInput = "";
+    private SentimentPrediction result;
+
+    private void Analyze()
+    {
+        var input = new SentimentData { Text = userInput };
+        // Use the pool to get a thread-safe prediction
+        result = PredictionPool.Predict(input);
+    }
+}
